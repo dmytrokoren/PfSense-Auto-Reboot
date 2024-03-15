@@ -19,11 +19,6 @@ output=$({
     cleanup() {
         counter_file="/usr/local/bin/PfReboot_count.txt"
         echo "ready" >>"$counter_file"
-        if [ $? -eq 130 ]; then
-            echo -e "\nScript encountered an error"
-        else
-            echo -e "\nScript terminated by user"
-        fi
         exit 1
     }
 
@@ -49,7 +44,7 @@ output=$({
         #echo "The current status is not 'ready'. Exiting the script." >>pfreboot_status.txt
         #wall pfreboot_status.txt
         #rm pfreboot_status.txt
-        exit 0
+        exit 22
     fi
 
     # Remove the second line from the file
@@ -159,7 +154,7 @@ output=$({
                     fi
                 fi
             fi
-            sleep $timeInSeconds
+            sleep $(($timeInSeconds - 1))
         done
         update_status_state
     fi
@@ -168,12 +163,14 @@ output=$({
 # Exit status logic
 exitStatus=${PIPESTATUS[0]}
 
-if [ -z "$output" ]; then
-    curl -fsS --retry 3 "${hcPingDomain}${hcUUID}/${exitStatus}"
-else
-    if [ "$exitStatus" -eq 0 ]; then
-        curl -fsS --retry 3 --data-raw "${output}" "${hcPingDomain}${hcUUID}/fail"
+if [[ "$exitStatus" != 22 ]]; then
+    if [ -z "$output" ]; then
+        curl -fsS --retry 3 "${hcPingDomain}${hcUUID}/${exitStatus}"
     else
-        curl -fsS --retry 3 --data-raw "${output}" "${hcPingDomain}${hcUUID}/${exitStatus}"
+        if [ "$exitStatus" -eq 0 ]; then
+            curl -fsS --retry 3 --data-raw "${output}" "${hcPingDomain}${hcUUID}/fail"
+        else
+            curl -fsS --retry 3 --data-raw "${output}" "${hcPingDomain}${hcUUID}/${exitStatus}"
+        fi
     fi
 fi
