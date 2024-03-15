@@ -154,7 +154,7 @@ output=$({
                     fi
                 fi
             fi
-            sleep $(($timeInSeconds - 2))
+            sleep $(($timeInSeconds - 1))
         done
         update_status_state
     fi
