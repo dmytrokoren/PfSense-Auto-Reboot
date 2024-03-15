@@ -71,7 +71,7 @@ A straightforward script designed to reboot your pfSense box when it is not conn
   Services > corn > add
 
   Then type as follows
-  (I'm setting cron job for every 5 mins, as I have set iterations: 5, timeInSeconds: 60)
+  (I'm setting cron job for every 5 mins, as I have set iterations: 5, timeInSeconds: 60)<br>
   This will ping the healthchecks.io once every 5 mins, but the ping check will occur every 1 minute.
 
         - Minute - */5
