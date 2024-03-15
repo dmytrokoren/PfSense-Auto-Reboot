@@ -24,7 +24,7 @@ output=$({
         else
             echo -e "\nScript terminated by user"
         fi
-        exit 1
+        exit 0
     }
 
     # Set up a trap to catch ERR and SIGINT signals
