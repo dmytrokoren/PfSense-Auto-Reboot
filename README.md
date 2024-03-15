@@ -1,8 +1,6 @@
 # PfSense-Auto-Reboot (Tested on pfSense 2.7.2)
 
-A simple script to reboot your pfSense box when it is not connected to the internet.
-
-This guide is extremely beginner friendly. I wish I had it, when I was starting out.
+A straightforward script designed to reboot your pfSense box when it is not connected to the internet.
 
 - Copy the script to the local pfsense router.
 
@@ -19,7 +17,7 @@ This guide is extremely beginner friendly. I wish I had it, when I was starting 
   4. Download the script file.
 
   ```
-  curl -LJO https://raw.githubusercontent.com/dmytrokoren/PfSense-Auto-Reboot/main/PfReboot.sh
+  curl -LJO https://raw.githubusercontent.com/dmytrokoren/PfSense-Auto-Reboot/main/PfReboot_hc.sh
   ```
 
   5. Install nano file editor
@@ -29,10 +27,10 @@ This guide is extremely beginner friendly. I wish I had it, when I was starting 
   pkg install nano
   ```
 
-  6. Change your wan adapter name, if required (mine is re0) using nano
+  6. Change your wan adapter name, if required (mine is re0), update iterations, and sleep time using nano
 
   ```
-  nano PfReboot.sh
+  nano PfReboot_hc.sh
   ```
 
   7. (OPTONAL) Change the script to customize your experience.
@@ -53,13 +51,13 @@ This guide is extremely beginner friendly. I wish I had it, when I was starting 
   2. Change permisson to executable.
 
   ```
-  chmod +x PfReboot.sh
+  chmod +x PfReboot_hc.sh
   ```
 
-  3. Run it as "bash PfReboot.sh".
+  3. Run it as "bash PfReboot_hc.sh".
 
   ```
-  bash PfReboot.sh
+  bash PfReboot_hc.sh
   ```
 
 - To run the the script on your local pfsence box on schedule.
@@ -73,14 +71,16 @@ This guide is extremely beginner friendly. I wish I had it, when I was starting 
   Services > corn > add
 
   Then type as follows
+  (I'm setting cron job for every 5 mins, as I have set iterations: 5, timeInSeconds: 60)
+  This will ping the healthchecks.io once every 5 mins, but the ping check will occur every 1 minute.
 
-      - Minute - *
-      - Hour - *
-      - Day of the month - *
-      - Month of the year - *
-      - Day of the week - *
-      - User -  root
-      - Command - ``` bash /usr/local/bin/PfReboot.sh ```
+        - Minute - */5
+        - Hour - *
+        - Day of the month - *
+        - Month of the year - *
+        - Day of the week - *
+        - User -  root
+        - Command - ``` bash /usr/local/bin/PfReboot_hc.sh ```
 
   3. Click on Save.
 
