@@ -1,6 +1,6 @@
 # PfSense-Auto-Reboot (Tested on pfSense 2.7.2)
 
-A straightforward script designed to reboot your pfSense box when it is not connected to the internet.
+A straightforward script designed to reboot your pfSense box when it is not connected to the internet.<br>
 Note: https://healthchecks.io account must be setup.
 
 - Copy the script to the local pfsense router.
