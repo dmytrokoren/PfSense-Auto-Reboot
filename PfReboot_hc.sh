@@ -15,9 +15,10 @@ hcUUID=""
 
 output=$({
 
+    counter_file="/usr/local/bin/PfReboot_count.txt"
+
     # Function to be executed on error or termination
     cleanup() {
-        counter_file="/usr/local/bin/PfReboot_count.txt"
         echo "ready" >>"$counter_file"
         exit 1
     }
@@ -25,9 +26,7 @@ output=$({
     # Set up a trap to catch ERR and SIGINT signals
     trap cleanup ERR INT
 
-    counter_file="/usr/local/bin/PfReboot_count.txt"
-
-    # Check if the file exists
+    # Check if the file exists and set values
     if [ ! -e "$counter_file" ]; then
         echo "0" >"$counter_file"
         echo "ready" >>"$counter_file"
@@ -47,7 +46,7 @@ output=$({
         exit 22
     fi
 
-    # Remove the second line from the file
+    # Remove the second line from the counter_file
     awk 'NR!=2' "$counter_file" >temp_file && mv temp_file "$counter_file"
 
     # Max reboots before sleep
@@ -103,12 +102,12 @@ output=$({
             counting=$(ping -o -s 0 -c 10 $firstDNS | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }')
 
             if [ $counting -eq 0 ]; then
-                php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("Ping to DNS server '$firstDNS' is unreachable.");'
+                php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("Ping to DNS server '$firstDNS' is unreachable");'
 
                 counting=$(ping -o -s 0 -c 10 $secondDNS | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }')
 
                 if [ $counting -eq 0 ]; then
-                    php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("Ping to DNS server '$secondDNS' is unreachable.");'
+                    php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("Ping to DNS server '$secondDNS' is unreachable");'
 
                     # Trying to restart NIC
                     # Change the NIC name as per your WAN
@@ -130,10 +129,10 @@ output=$({
                     counting=$(ping -o -s 0 -c 10 $firstDNS | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }')
 
                     if [ $counting -eq 0 ]; then
-                        php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("Ping to DNS server '$firstDNS' remains unreachable even after WAN ('$nic_name') restart.");'
+                        php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("Ping to DNS server '$firstDNS' remains unreachable even after WAN ('$nic_name') restart");'
 
                         if [ "$current_count" -ge "$max_reboots" ]; then
-                            php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("The maximum number of reboots ('$max_reboots') has been reached. The system will wait for 1 hour before the next reboot interval.");'
+                            php -r 'require_once("/etc/inc/notices.inc"); notify_via_telegram("The maximum number of reboots ('$max_reboots') has been reached. The system will wait for 1 hour before the next reboot interval");'
 
                             sleep 1h
 
@@ -154,7 +153,15 @@ output=$({
                     fi
                 fi
             fi
-            sleep $(($timeInSeconds - 1))
+
+            sleep_duration=$(echo "$timeInSeconds - 0.02" | bc)
+
+            if [ $i -eq 5 ]; then
+                update_status_state
+                sleep $sleep_duration
+            else
+                sleep $sleep_duration
+            fi
         done
         update_status_state
     fi
