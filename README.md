@@ -1,6 +1,7 @@
 # PfSense-Auto-Reboot (Tested on pfSense 2.7.2)
 
 A straightforward script designed to reboot your pfSense box when it is not connected to the internet.
+Note: https://healthchecks.io account must be setup.
 
 - Copy the script to the local pfsense router.
 
@@ -27,7 +28,7 @@ A straightforward script designed to reboot your pfSense box when it is not conn
   pkg install nano
   ```
 
-  6. Change your wan adapter name, if required (mine is re0), update iterations, and sleep time using nano
+  6. Change your wan adapter name, if required (mine is re0), update iterations, sleep time, and hcUUID values using nano
 
   ```
   nano PfReboot_hc.sh
@@ -40,7 +41,7 @@ A straightforward script designed to reboot your pfSense box when it is not conn
 
   8. After Pasting the Script. Press `ESC` then `:x` to exit from the vi editor.
 
-- To test the script on your local pfsense box.
+- To test the script on your local pfsense box (adjust the iterations and sleep time for quicker test).
 
   1. Install bash, if not installed already.
 
