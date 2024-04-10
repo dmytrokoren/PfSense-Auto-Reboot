@@ -15,25 +15,29 @@ hcUUID=""
 
 output=$({
 
-    counter_file="/tmp/PfReboot_count.txt"
+    counter_file="/usr/local/bin/PfReboot_counter.txt"
+    status_file="/tmp/PfReboot_status.txt"
 
     # Function to be executed on error or termination
     cleanup() {
-        echo "ready" >>"$counter_file"
+        echo "0" >"$counter_file"
+        echo "ready" >>"$status_file"
         exit 1
     }
 
     # Set up a trap to catch ERR and SIGINT signals
     trap cleanup ERR INT
 
-    # Check if the file exists and set values
+    # Check if the files exists and set values
     if [ ! -e "$counter_file" ]; then
         echo "0" >"$counter_file"
-        echo "ready" >>"$counter_file"
+    fi
+    if [ ! -e "$status_file" ]; then
+        echo "ready" >>"$status_file"
     fi
 
-    # Read the second line of the file
-    current_status=$(sed -n '2p' "$counter_file")
+    # Read the status file
+    current_status=$(sed -n '1p' "$status_file")
 
     # Check if the second line contains "ready"
     if [[ -z "$current_status" || "$current_status" != "ready" ]]; then
@@ -46,8 +50,8 @@ output=$({
         exit 22
     fi
 
-    # Remove the second line from the counter_file
-    awk 'NR!=2' "$counter_file" >temp_file && mv temp_file "$counter_file"
+    # Remove the 'ready' status from the status_file
+    sed '1d' "$status_file"
 
     # Max reboots before sleep
     max_reboots=2
@@ -56,20 +60,20 @@ output=$({
     iterations=5
     timeInSeconds=60
 
-    # Read the first line of the file
-    current_count=$(head -n 1 "$counter_file" 2>/dev/null)
+    # Read the counter file
+    current_count=$(sed -n '1p' "$counter_file")
 
     # Increment and save counter function
     increment_counter() {
-        current_count=$(head -n 1 "$counter_file" 2>/dev/null)
+        #current_count=$(head -n 1 "$counter_file" 2>/dev/null)
         [ -z "$current_count" ] && current_count=0
         ((current_count++))
         echo "$current_count" >"$counter_file"
     }
 
     update_status_state() {
-        if ! grep -q "ready" "$counter_file"; then
-            echo "ready" >>"$counter_file"
+        if ! grep -q "ready" "$status_file"; then
+            echo "ready" >>"$status_file"
         fi
     }
 
@@ -87,9 +91,9 @@ output=$({
     # If boot is longer than 120 seconds ago... (To avoid bootloops)
     if [ $utime -gt 120 ]; then
         # Uncomment the following lines if you want feedback on the console
-        #echo "Testing Connection at" $(date +%Y-%m-%d.%H:%M:%S) "uptime:" $utime "seconds" >>pfreboot_log.txt
-        #wall pfreboot_log.txt
-        #rm pfreboot_log.txt
+        #echo "Testing Connection at" $(date +%Y-%m-%d.%H:%M:%S) "uptime:" $utime "seconds" >>PfReboot_log.txt
+        #wall PfReboot_log.txt
+        #rm PfReboot_log.txt
 
         # Try 1 or 2 minutes worth of very short pings to Cloudflare public DNS servers
         # Quit immediately if we get a single frame back
