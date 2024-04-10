@@ -15,7 +15,7 @@ hcUUID=""
 
 output=$({
 
-    counter_file="/usr/local/bin/PfReboot_count.txt"
+    counter_file="/tmp/PfReboot_count.txt"
 
     # Function to be executed on error or termination
     cleanup() {
