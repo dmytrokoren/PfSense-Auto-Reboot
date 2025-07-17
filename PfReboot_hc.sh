@@ -95,8 +95,8 @@ output=$({
         # Quit immediately if we get a single frame back
         # If neither server responds at all, then reboot the firewall
 
-        firstDNS="1.0.0.1"
-        secondDNS="1.1.1.1"
+        firstDNS="8.8.8.8"
+        secondDNS="8.8.4.4"
 
         for i in $(seq 1 1 $iterations); do
             counting=$(ping -o -s 0 -c 10 $firstDNS | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }')
